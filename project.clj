@@ -3,7 +3,11 @@
   :url "http://example.com/FIXME"
   :license {:name "MIT License"
             :url "https://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.8.0"]]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/tools.logging "0.3.1"]
+                 [log4j "1.2.16"]
+                 [cheshire "5.7.0"]
+                 [http-kit "2.2.0"]]
   :main ^:skip-aot tcc-fetch.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
