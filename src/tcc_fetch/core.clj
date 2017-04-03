@@ -1,6 +1,7 @@
 (ns tcc-fetch.core
   (:gen-class)
   (:require
+    [ardoq.analytics-clj :as segment]
     [cheshire.core :as json]
     [clojure.edn :as edn]
     [clojure.java.io :as jio]
@@ -125,20 +126,27 @@
             {:headers {"Content-type" "application/json"}
              :body (json/generate-string metrics)})))
 
+(defn send-event
+  [segment-client user-id temps]
+  (segment/track segment-client user-id "Thermostat Read" temps))
+
 (defn run-loop
-  [{:keys [tcc-auth librato-auth]}]
-  (loop []
-    (let [t0 (System/currentTimeMillis)]
-      (try
-        (let [temps (read-temps tcc-auth)
-              metrics (temps-to-metrics temps)]
-          (log/info temps)
-          (post-metrics librato-auth metrics))
-        (catch Throwable t
-          (log/error t "Error")))
-      (let [dt (- (System/currentTimeMillis) t0)]
-        (Thread/sleep (max min-sleep-time-ms (- sleep-time-ms dt)))
-        (recur)))))
+  [{:keys [tcc-auth librato-auth segment-auth]}]
+  (let [segment-client (segment/initialize (:write-key segment-auth))
+        user-id (:user-id segment-auth)]
+    (loop []
+      (let [t0 (System/currentTimeMillis)]
+        (try
+          (let [temps (read-temps tcc-auth)
+                metrics (temps-to-metrics temps)]
+            (log/info temps)
+            (send-event segment-client user-id temps)
+            (comment (post-metrics librato-auth metrics)))
+          (catch Throwable t
+            (log/error t "Error")))
+        (let [dt (- (System/currentTimeMillis) t0)]
+          (Thread/sleep (max min-sleep-time-ms (- sleep-time-ms dt)))
+          (recur))))))
 
 (defn load-config
   [config-file]
