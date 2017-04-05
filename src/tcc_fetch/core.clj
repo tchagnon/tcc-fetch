@@ -142,7 +142,7 @@
                 metrics (temps-to-metrics temps)]
             (log/info temps)
             (send-event segment-client user-id temps)
-            (comment (post-metrics librato-auth metrics)))
+            (post-metrics librato-auth metrics))
           (catch Throwable t
             (log/error t "Error")))
         (let [dt (- (System/currentTimeMillis) t0)]
