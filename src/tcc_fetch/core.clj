@@ -7,6 +7,7 @@
     [clojure.java.io :as jio]
     [clojure.string :as s]
     [clojure.tools.logging :as log]
+    [clojure.walk :as walk]
     [clojure.xml :as xml]
     [org.httpkit.client :as http]))
 
@@ -128,7 +129,7 @@
 
 (defn send-event
   [segment-client user-id temps]
-  (segment/track segment-client user-id "Thermostat Read" temps))
+  (segment/track segment-client user-id "Thermostat Read" (walk/stringify-keys temps)))
 
 (defn run-loop
   [{:keys [tcc-auth librato-auth segment-auth]}]
@@ -162,4 +163,12 @@
 
 (comment
   (require '[clojure.pprint :as pprint])
+
+  (def config (load-config "config.clj"))
+
+  (def temps (read-temps (:tcc-auth config)))
+  (pprint temps)
+
+  (walk/stringify-keys temps)
+
          )
