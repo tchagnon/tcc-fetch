@@ -5,6 +5,7 @@
             :url "https://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.slf4j/slf4j-log4j12 "1.7.5"]
                  [analytics-clj "0.3.0"]
                  [log4j "1.2.16"]
                  [cheshire "5.7.0"]
